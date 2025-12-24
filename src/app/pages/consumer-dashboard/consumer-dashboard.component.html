@@ -1,0 +1,69 @@
+<section class="dashboard-page">
+    <div class="container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="welcome">
+                <h1>Hello, {{ user?.name }}! 👋</h1>
+                <p>Welcome back to your Digital Farmer account.</p>
+            </div>
+            <button class="btn btn-primary" (click)="logout()">
+                Logout
+            </button>
+        </div>
+
+        <!-- Orders Section -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2>My Orders</h2>
+            </div>
+
+            @if (isLoading()) {
+            <div class="loading-state">Loading your orders...</div>
+            } @else if (orders().length === 0) {
+            <div class="empty-state">
+                <span class="icon">📦</span>
+                <p>You haven't placed any orders yet.</p>
+                <a routerLink="/products" class="btn btn-primary">Start Shopping</a>
+            </div>
+            } @else {
+            <div class="orders-list">
+                @for (order of orders(); track order.id) {
+                <div class="order-card">
+                    <div class="order-header">
+                        <div>
+                            <span class="order-id">Order #{{ order.id }}</span>
+                            <span class="order-date">{{ order.createdAt | date:'mediumDate' }}</span>
+                        </div>
+                        <span class="status-badge" [class]="getStatusClass(order.status)">
+                            {{ order.status | titlecase }}
+                        </span>
+                    </div>
+
+                    <div class="order-items">
+                        @for (item of order.items; track item.productId) {
+                        <div class="order-item">
+                            <span class="item-name">{{ item.productName }}</span>
+                            <span class="item-qty">x{{ item.quantity }}</span>
+                            <span class="item-price">Rs. {{ item.price * item.quantity }}</span>
+                        </div>
+                        }
+                    </div>
+
+                    <div class="order-footer">
+                        <div class="order-total">
+                            <span>Total:</span>
+                            <strong>Rs. {{ order.total }}</strong>
+                        </div>
+                        @if (order.customerNote) {
+                        <div class="order-note">
+                            <small>Note: {{ order.customerNote }}</small>
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+    </div>
+</section>

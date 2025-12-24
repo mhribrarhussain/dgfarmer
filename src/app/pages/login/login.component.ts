@@ -24,11 +24,10 @@ export class LoginComponent {
         this.error = '';
         this.isLoading = true;
 
-        setTimeout(() => {
-            const success = this.authService.login(this.email, this.password);
+        this.authService.login(this.email, this.password).subscribe(result => {
             this.isLoading = false;
 
-            if (success) {
+            if (result.success) {
                 const user = this.authService.getCurrentUser();
                 if (user?.role === 'farmer') {
                     this.router.navigate(['/dashboard']);
@@ -36,8 +35,8 @@ export class LoginComponent {
                     this.router.navigate(['/']);
                 }
             } else {
-                this.error = 'Invalid email or password. Please register first if you don\'t have an account.';
+                this.error = result.error || 'Invalid email or password. Please register first if you don\'t have an account.';
             }
-        }, 500);
+        });
     }
 }

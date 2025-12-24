@@ -1,100 +1,109 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, of, map, catchError, tap } from 'rxjs';
 import { User, AuthState } from '../models/user.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
-    private authState: AuthState = {
-        isAuthenticated: false,
-        user: null
-    };
+    private http = inject(HttpClient);
+    private apiUrl = environment.apiUrl;
 
-    private authSubject = new BehaviorSubject<AuthState>(this.authState);
-    auth$ = this.authSubject.asObservable();
+    private currentUser = signal<User | null>(null);
+    private token = signal<string | null>(null);
 
     constructor() {
         this.loadFromStorage();
     }
 
-    private loadFromStorage(): void {
-        const stored = localStorage.getItem('digitalFarmerAuth');
-        if (stored) {
-            this.authState = JSON.parse(stored);
-            this.authSubject.next(this.authState);
+    private loadFromStorage() {
+        const storedToken = localStorage.getItem('dgfarmer_token');
+        const storedUser = localStorage.getItem('dgfarmer_user');
+
+        if (storedToken && storedUser) {
+            this.token.set(storedToken);
+            this.currentUser.set(JSON.parse(storedUser));
         }
     }
 
-    private saveToStorage(): void {
-        localStorage.setItem('digitalFarmerAuth', JSON.stringify(this.authState));
-        this.authSubject.next(this.authState);
+    login(email: string, password: string): Observable<{ success: boolean; error?: string }> {
+        return this.http.post<any>(`${this.apiUrl}/auth/login`, { email, password }).pipe(
+            tap(response => {
+                this.saveAuth(response);
+            }),
+            map(() => ({ success: true })),
+            catchError(error => {
+                const message = error.error?.message || 'Login failed. Please try again.';
+                return of({ success: false, error: message });
+            })
+        );
     }
 
-    login(email: string, password: string): boolean {
-        // Mock login - in real app, this would call an API
-        const users = this.getStoredUsers();
-        const user = users.find(u => u.email === email);
-
-        if (user) {
-            this.authState = {
-                isAuthenticated: true,
-                user: user
-            };
-            this.saveToStorage();
-            return true;
-        }
-        return false;
-    }
-
-    register(name: string, email: string, password: string, role: 'farmer' | 'buyer'): boolean {
-        const users = this.getStoredUsers();
-
-        if (users.find(u => u.email === email)) {
-            return false; // User already exists
-        }
-
-        const newUser: User = {
-            id: Date.now(),
+    register(name: string, email: string, password: string, role: string): Observable<{ success: boolean; error?: string }> {
+        return this.http.post<any>(`${this.apiUrl}/auth/register`, {
             name,
             email,
+            password,
             role
-        };
-
-        users.push(newUser);
-        localStorage.setItem('digitalFarmerUsers', JSON.stringify(users));
-
-        this.authState = {
-            isAuthenticated: true,
-            user: newUser
-        };
-        this.saveToStorage();
-        return true;
+        }).pipe(
+            tap(response => {
+                this.saveAuth(response);
+            }),
+            map(() => ({ success: true })),
+            catchError(error => {
+                const message = error.error?.message || 'Registration failed. Please try again.';
+                return of({ success: false, error: message });
+            })
+        );
     }
 
-    logout(): void {
-        this.authState = {
-            isAuthenticated: false,
-            user: null
+    private saveAuth(response: any) {
+        const user: User = {
+            id: response.id,
+            name: response.name,
+            email: response.email,
+            role: response.role as 'farmer' | 'buyer',
+            phone: response.phone,
+            address: response.address
         };
-        localStorage.removeItem('digitalFarmerAuth');
-        this.authSubject.next(this.authState);
+
+        this.currentUser.set(user);
+        this.token.set(response.token);
+
+        localStorage.setItem('dgfarmer_token', response.token);
+        localStorage.setItem('dgfarmer_user', JSON.stringify(user));
+    }
+
+    logout() {
+        this.currentUser.set(null);
+        this.token.set(null);
+        localStorage.removeItem('dgfarmer_token');
+        localStorage.removeItem('dgfarmer_user');
     }
 
     getCurrentUser(): User | null {
-        return this.authState.user;
+        return this.currentUser();
+    }
+
+    getToken(): string | null {
+        return this.token();
     }
 
     isAuthenticated(): boolean {
-        return this.authState.isAuthenticated;
+        return this.token() !== null;
     }
 
     isFarmer(): boolean {
-        return this.authState.user?.role === 'farmer';
+        return this.currentUser()?.role === 'farmer';
     }
 
-    private getStoredUsers(): User[] {
-        const stored = localStorage.getItem('digitalFarmerUsers');
-        return stored ? JSON.parse(stored) : [];
+    // Helper to get auth headers
+    getAuthHeaders(): HttpHeaders {
+        const token = this.token();
+        return token
+            ? new HttpHeaders({ 'Authorization': `Bearer ${token}` })
+            : new HttpHeaders();
     }
 }

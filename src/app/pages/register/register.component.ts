@@ -26,19 +26,18 @@ export class RegisterComponent {
         this.error = '';
         this.isLoading = true;
 
-        setTimeout(() => {
-            const success = this.authService.register(this.name, this.email, this.password, this.role);
+        this.authService.register(this.name, this.email, this.password, this.role).subscribe(result => {
             this.isLoading = false;
 
-            if (success) {
+            if (result.success) {
                 if (this.role === 'farmer') {
                     this.router.navigate(['/dashboard']);
                 } else {
                     this.router.navigate(['/']);
                 }
             } else {
-                this.error = 'An account with this email already exists.';
+                this.error = result.error || 'An account with this email already exists.';
             }
-        }, 500);
+        });
     }
 }

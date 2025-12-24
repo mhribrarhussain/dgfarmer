@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
+import { Product } from '../../models/product.model';
 
 @Component({
     selector: 'app-home',
@@ -11,10 +12,11 @@ import { ProductCardComponent } from '../../components/product-card/product-card
     templateUrl: './home.component.html',
     styleUrl: './home.component.scss'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
     private productService = inject(ProductService);
 
-    featuredProducts = this.productService.getFeatured();
+    featuredProducts = signal<Product[]>([]);
+    isLoading = signal(true);
 
     features = [
         {
@@ -59,4 +61,11 @@ export class HomeComponent {
             avatar: '👩'
         }
     ];
+
+    ngOnInit() {
+        this.productService.getFeatured().subscribe(products => {
+            this.featuredProducts.set(products);
+            this.isLoading.set(false);
+        });
+    }
 }

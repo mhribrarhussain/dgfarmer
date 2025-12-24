@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -20,21 +20,34 @@ export class ProductDetailComponent implements OnInit {
     private productService = inject(ProductService);
     private cartService = inject(CartService);
 
-    product: Product | undefined;
-    relatedProducts: Product[] = [];
+    product = signal<Product | null>(null);
+    relatedProducts = signal<Product[]>([]);
+    isLoading = signal(true);
     quantity = 1;
     addedToCart = false;
 
     ngOnInit() {
         this.route.params.subscribe(params => {
             const id = +params['id'];
-            this.product = this.productService.getById(id);
+            this.loadProduct(id);
+        });
+    }
 
-            if (this.product) {
-                this.relatedProducts = this.productService
-                    .getByCategory(this.product.category)
-                    .filter(p => p.id !== id)
-                    .slice(0, 4);
+    loadProduct(id: number) {
+        this.isLoading.set(true);
+
+        this.productService.getById(id).subscribe(product => {
+            if (product) {
+                this.product.set(product);
+
+                // Load related products
+                this.productService.getAll(product.category).subscribe(products => {
+                    const related = products
+                        .filter((p: Product) => p.id !== id)
+                        .slice(0, 4);
+                    this.relatedProducts.set(related);
+                    this.isLoading.set(false);
+                });
             } else {
                 this.router.navigate(['/products']);
             }
@@ -48,27 +61,30 @@ export class ProductDetailComponent implements OnInit {
     }
 
     increaseQuantity() {
-        if (this.product && this.quantity < this.product.stock) {
+        const prod = this.product();
+        if (prod && this.quantity < prod.stock) {
             this.quantity++;
         }
     }
 
     addToCart() {
-        if (this.product) {
-            this.cartService.addToCart(this.product, this.quantity);
+        const prod = this.product();
+        if (prod) {
+            this.cartService.addToCart(prod, this.quantity);
             this.addedToCart = true;
             setTimeout(() => this.addedToCart = false, 2000);
         }
     }
 
     getCategoryIcon(): string {
-        if (!this.product) return '📦';
+        const prod = this.product();
+        if (!prod) return '📦';
         const icons: Record<string, string> = {
             vegetables: '🥬',
             fruits: '🍎',
             grains: '🌾',
             dairy: '🥛'
         };
-        return icons[this.product.category] || '📦';
+        return icons[prod.category] || '📦';
     }
 }

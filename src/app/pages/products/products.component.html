@@ -37,7 +37,7 @@
             <aside class="categories-sidebar">
                 <h3>Categories</h3>
                 <ul class="category-list">
-                    @for (category of categories; track category) {
+                    @for (category of categories(); track category) {
                     <li>
                         <button class="category-btn" [class.active]="selectedCategory === category"
                             (click)="onCategoryChange(category)">
@@ -52,12 +52,16 @@
             <!-- Products Grid -->
             <div class="products-main">
                 <div class="results-info">
-                    <span>Showing {{ filteredProducts.length }} products</span>
+                    <span>Showing {{ filteredProducts().length }} products</span>
                 </div>
 
-                @if (filteredProducts.length > 0) {
+                @if (isLoading()) {
+                <div class="loading-state">
+                    <p>Loading products...</p>
+                </div>
+                } @else if (filteredProducts().length > 0) {
                 <div class="product-grid">
-                    @for (product of filteredProducts; track product.id) {
+                    @for (product of filteredProducts(); track product.id) {
                     <app-product-card [product]="product"></app-product-card>
                     }
                 </div>

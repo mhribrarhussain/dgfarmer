@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -17,68 +17,71 @@ export class ProductsComponent implements OnInit {
     private productService = inject(ProductService);
     private route = inject(ActivatedRoute);
 
-    products: Product[] = [];
-    filteredProducts: Product[] = [];
-    categories = this.productService.getCategories();
+    products = signal<Product[]>([]);
+    filteredProducts = signal<Product[]>([]);
+    categories = signal<string[]>(['all', 'vegetables', 'fruits', 'grains', 'dairy']);
+    isLoading = signal(true);
+
     selectedCategory = 'all';
     searchQuery = '';
     sortBy = 'name';
 
     ngOnInit() {
-        this.products = this.productService.getAll();
-        this.filteredProducts = this.products;
+        // Load categories from API
+        this.productService.getCategories().subscribe(cats => {
+            this.categories.set(cats);
+        });
 
+        // Check for category in query params
         this.route.queryParams.subscribe(params => {
             if (params['category']) {
                 this.selectedCategory = params['category'];
-                this.filterProducts();
             }
+            this.loadProducts();
         });
     }
 
-    filterProducts() {
-        let result = this.selectedCategory === 'all'
-            ? this.products
-            : this.productService.getByCategory(this.selectedCategory);
+    loadProducts() {
+        this.isLoading.set(true);
+        const category = this.selectedCategory === 'all' ? undefined : this.selectedCategory;
+        const search = this.searchQuery || undefined;
 
-        if (this.searchQuery) {
-            const query = this.searchQuery.toLowerCase();
-            result = result.filter(p =>
-                p.name.toLowerCase().includes(query) ||
-                p.farmer.toLowerCase().includes(query)
-            );
-        }
-
-        this.sortProducts(result);
+        this.productService.getAll(category, search).subscribe(products => {
+            this.products.set(products);
+            this.sortProducts(products);
+            this.isLoading.set(false);
+        });
     }
 
     sortProducts(products: Product[]) {
+        let sorted: Product[];
         switch (this.sortBy) {
             case 'price-low':
-                this.filteredProducts = [...products].sort((a, b) => a.price - b.price);
+                sorted = [...products].sort((a, b) => a.price - b.price);
                 break;
             case 'price-high':
-                this.filteredProducts = [...products].sort((a, b) => b.price - a.price);
+                sorted = [...products].sort((a, b) => b.price - a.price);
                 break;
             case 'rating':
-                this.filteredProducts = [...products].sort((a, b) => b.rating - a.rating);
+                sorted = [...products].sort((a, b) => b.rating - a.rating);
                 break;
             default:
-                this.filteredProducts = [...products].sort((a, b) => a.name.localeCompare(b.name));
+                sorted = [...products].sort((a, b) => a.name.localeCompare(b.name));
         }
+        this.filteredProducts.set(sorted);
     }
 
     onCategoryChange(category: string) {
         this.selectedCategory = category;
-        this.filterProducts();
+        this.loadProducts();
     }
 
     onSearch() {
-        this.filterProducts();
+        this.loadProducts();
     }
 
     onSortChange() {
-        this.filterProducts();
+        this.sortProducts(this.products());
     }
 
     getCategoryIcon(category: string): string {

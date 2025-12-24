@@ -25,7 +25,6 @@
                     <span class="stat-value">{{ stat.value }}</span>
                     <span class="stat-label">{{ stat.label }}</span>
                 </div>
-                <span class="stat-change positive">{{ stat.change }}</span>
             </div>
             }
         </div>
@@ -36,31 +35,48 @@
             <div class="dashboard-card">
                 <div class="card-header">
                     <h2>Recent Orders</h2>
-                    <button class="btn btn-ghost">View All</button>
                 </div>
+
+                @if (orders().length === 0) {
+                <p class="empty-list">No orders received yet.</p>
+                } @else {
                 <table class="orders-table">
                     <thead>
                         <tr>
                             <th>Order ID</th>
-                            <th>Customer</th>
-                            <th>Items</th>
-                            <th>Total</th>
+                            <th>Customer Items</th>
+                            <th>Total (My Items)</th>
+                            <th>Note</th>
                             <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @for (order of recentOrders; track order.id) {
+                        @for (order of orders(); track order.id) {
                         <tr>
                             <td>#{{ order.id }}</td>
-                            <td>{{ order.customer }}</td>
-                            <td>{{ order.items }}</td>
-                            <td>Rs. {{ order.total }}</td>
-                            <td><span class="status-badge" [class]="getStatusClass(order.status)">{{ order.status
+                            <td>
+                                <ul class="order-items-compact">
+                                    @for (item of order.items; track item.productId) {
+                                    <li>{{ item.quantity }}x {{ item.productName }}</li>
+                                    }
+                                </ul>
+                            </td>
+                            <td>Rs. {{ order.total }}</td> <!-- This is total of filtered items now -->
+                            <td>
+                                @if(order.customerNote) {
+                                <span class="note-tooltip" [title]="order.customerNote">📝 Note</span>
+                                } @else {
+                                <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td><span class="status-badge" [class]="getStatusClass(order.status)">{{ order.status |
+                                    titlecase
                                     }}</span></td>
                         </tr>
                         }
                     </tbody>
                 </table>
+                }
             </div>
 
             <!-- My Products -->
@@ -70,7 +86,7 @@
                     <button class="btn btn-ghost">Manage All</button>
                 </div>
                 <div class="products-list">
-                    @for (product of products; track product.id) {
+                    @for (product of products(); track product.id) {
                     <div class="product-item">
                         <img [src]="product.image" [alt]="product.name">
                         <div class="product-details">
@@ -126,6 +142,39 @@
                         <option value="grains">Grains</option>
                         <option value="dairy">Dairy</option>
                     </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Stock Quantity</label>
+                        <input type="number" class="form-input" [(ngModel)]="newProduct.stock" name="stock" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Image</label>
+                        <div class="image-upload-wrapper">
+                            <input type="file" id="productImage" accept="image/*" (change)="onImageSelected($event)"
+                                class="file-input">
+                            <label for="productImage" class="file-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                Choose Image
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                @if (imagePreview) {
+                <div class="image-preview">
+                    <img [src]="imagePreview" alt="Preview">
+                    <button type="button" class="remove-image" (click)="removeImage()">×</button>
+                </div>
+                }
+                <div class="form-group">
+                    <label class="form-label">Or paste Image URL</label>
+                    <input type="url" class="form-input" [(ngModel)]="newProduct.image" name="image"
+                        placeholder="https://example.com/image.jpg">
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-ghost" (click)="closeAddModal()">Cancel</button>
