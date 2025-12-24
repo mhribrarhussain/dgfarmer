@@ -1,0 +1,77 @@
+<section class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card glass-card">
+            <div class="auth-header">
+                <a routerLink="/" class="logo">
+                    <span>🌾</span> Digital<span class="highlight">Farmer</span>
+                </a>
+                <h1>Create Account</h1>
+                <p>Join our farming community</p>
+            </div>
+
+            <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+                @if (error) {
+                <div class="error-message">
+                    {{ error }}
+                </div>
+                }
+
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" placeholder="Enter your name" [(ngModel)]="name" name="name"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-input" placeholder="Enter your email" [(ngModel)]="email"
+                        name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" placeholder="Create a password" [(ngModel)]="password"
+                        name="password" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">I am a</label>
+                    <div class="role-selector">
+                        <button type="button" class="role-option" [class.active]="role === 'buyer'"
+                            (click)="role = 'buyer'">
+                            <span class="icon">🛒</span>
+                            <span class="label">Buyer</span>
+                            <small>Shop for fresh produce</small>
+                        </button>
+                        <button type="button" class="role-option" [class.active]="role === 'farmer'"
+                            (click)="role = 'farmer'">
+                            <span class="icon">👨‍🌾</span>
+                            <span class="label">Farmer</span>
+                            <small>Sell your products</small>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary submit-btn" [disabled]="isLoading">
+                    @if (isLoading) {
+                    Creating Account...
+                    } @else {
+                    Create Account
+                    }
+                </button>
+            </form>
+
+            <p class="auth-footer">
+                Already have an account? <a routerLink="/login">Sign in here</a>
+            </p>
+        </div>
+
+        <div class="auth-image">
+            <img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800" alt="Farmer in field">
+            <div class="overlay">
+                <h2>Join Our Community</h2>
+                <p>Connect with local farmers or start selling your own fresh produce today.</p>
+            </div>
+        </div>
+    </div>
+</section>

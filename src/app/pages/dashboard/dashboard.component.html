@@ -1,0 +1,138 @@
+<section class="dashboard-page">
+    <div class="container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="welcome">
+                <h1>Welcome back, {{ user?.name }}! 👋</h1>
+                <p>Here's what's happening with your farm today.</p>
+            </div>
+            <button class="btn btn-primary" (click)="openAddModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add Product
+            </button>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            @for (stat of stats; track stat.label) {
+            <div class="stat-card glass-card">
+                <div class="stat-icon">{{ stat.icon }}</div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ stat.value }}</span>
+                    <span class="stat-label">{{ stat.label }}</span>
+                </div>
+                <span class="stat-change positive">{{ stat.change }}</span>
+            </div>
+            }
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="dashboard-grid">
+            <!-- Recent Orders -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2>Recent Orders</h2>
+                    <button class="btn btn-ghost">View All</button>
+                </div>
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (order of recentOrders; track order.id) {
+                        <tr>
+                            <td>#{{ order.id }}</td>
+                            <td>{{ order.customer }}</td>
+                            <td>{{ order.items }}</td>
+                            <td>Rs. {{ order.total }}</td>
+                            <td><span class="status-badge" [class]="getStatusClass(order.status)">{{ order.status
+                                    }}</span></td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- My Products -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2>My Products</h2>
+                    <button class="btn btn-ghost">Manage All</button>
+                </div>
+                <div class="products-list">
+                    @for (product of products; track product.id) {
+                    <div class="product-item">
+                        <img [src]="product.image" [alt]="product.name">
+                        <div class="product-details">
+                            <h4>{{ product.name }}</h4>
+                            <p>Rs. {{ product.price }} / {{ product.unit }}</p>
+                        </div>
+                        <span class="stock-badge">{{ product.stock }} in stock</span>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    @if (showAddModal) {
+    <div class="modal-overlay" (click)="closeAddModal()">
+        <div class="modal glass-card" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Add New Product</h2>
+                <button class="close-btn" (click)="closeAddModal()">×</button>
+            </div>
+            <form (ngSubmit)="addProduct()">
+                <div class="form-group">
+                    <label class="form-label">Product Name</label>
+                    <input type="text" class="form-input" [(ngModel)]="newProduct.name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-input" rows="3" [(ngModel)]="newProduct.description"
+                        name="description"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Price (Rs.)</label>
+                        <input type="number" class="form-input" [(ngModel)]="newProduct.price" name="price" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Unit</label>
+                        <select class="form-input" [(ngModel)]="newProduct.unit" name="unit">
+                            <option value="kg">Kilogram</option>
+                            <option value="dozen">Dozen</option>
+                            <option value="liter">Liter</option>
+                            <option value="bundle">Bundle</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-input" [(ngModel)]="newProduct.category" name="category">
+                        <option value="vegetables">Vegetables</option>
+                        <option value="fruits">Fruits</option>
+                        <option value="grains">Grains</option>
+                        <option value="dairy">Dairy</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-ghost" (click)="closeAddModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    }
+</section>

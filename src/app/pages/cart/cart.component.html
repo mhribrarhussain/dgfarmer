@@ -1,0 +1,105 @@
+<section class="cart-page">
+    <div class="container">
+        <h1>Shopping Cart</h1>
+
+        @if (cartService.getCartItems().length > 0) {
+        <div class="cart-layout">
+            <!-- Cart Items -->
+            <div class="cart-items">
+                <div class="cart-header">
+                    <span>Product</span>
+                    <span>Price</span>
+                    <span>Quantity</span>
+                    <span>Total</span>
+                    <span></span>
+                </div>
+
+                @for (item of cartService.getCartItems(); track item.product.id) {
+                <div class="cart-item card">
+                    <div class="item-product">
+                        <img [src]="item.product.image" [alt]="item.product.name">
+                        <div class="item-info">
+                            <h3>{{ item.product.name }}</h3>
+                            <p>by {{ item.product.farmer }}</p>
+                        </div>
+                    </div>
+
+                    <div class="item-price">
+                        Rs. {{ item.product.price }}
+                    </div>
+
+                    <div class="item-quantity">
+                        <button (click)="updateQuantity(item.product.id, -1)" [disabled]="item.quantity <= 1">−</button>
+                        <span>{{ item.quantity }}</span>
+                        <button (click)="updateQuantity(item.product.id, 1)">+</button>
+                    </div>
+
+                    <div class="item-total">
+                        Rs. {{ item.product.price * item.quantity }}
+                    </div>
+
+                    <button class="remove-btn" (click)="removeItem(item.product.id)" title="Remove">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+                }
+
+                <button class="btn btn-ghost clear-btn" (click)="clearCart()">
+                    Clear Cart
+                </button>
+            </div>
+
+            <!-- Order Summary -->
+            <aside class="order-summary glass-card">
+                <h2>Order Summary</h2>
+
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>Rs. {{ subtotal }}</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    @if (shipping === 0) {
+                    <span class="free">FREE</span>
+                    } @else {
+                    <span>Rs. {{ shipping }}</span>
+                    }
+                </div>
+
+                @if (subtotal < 500) { <p class="shipping-note">
+                    Add Rs. {{ 500 - subtotal }} more for free shipping!
+                    </p>
+                    }
+
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span>Rs. {{ total }}</span>
+                    </div>
+
+                    <button class="btn btn-primary checkout-btn">
+                        Proceed to Checkout
+                    </button>
+
+                    <a routerLink="/products" class="continue-link">
+                        ← Continue Shopping
+                    </a>
+            </aside>
+        </div>
+        } @else {
+        <div class="empty-cart">
+            <span class="icon">🛒</span>
+            <h2>Your cart is empty</h2>
+            <p>Looks like you haven't added any products yet.</p>
+            <a routerLink="/products" class="btn btn-primary">
+                Start Shopping
+            </a>
+        </div>
+        }
+    </div>
+</section>

@@ -1,0 +1,162 @@
+<section class="about-page">
+    <!-- Hero Section -->
+    <div class="about-hero">
+        <div class="container">
+            <span class="badge">🌾 About Us</span>
+            <h1>Connecting Farms to Families</h1>
+            <p>We're on a mission to revolutionize how fresh produce reaches your table, supporting local farmers while
+                delivering quality to your doorstep.</p>
+        </div>
+    </div>
+
+    <!-- Mission Section -->
+    <section class="mission section">
+        <div class="container">
+            <div class="mission-grid">
+                <div class="mission-content">
+                    <h2>Our Mission</h2>
+                    <p>Digital Farmer was born from a simple idea: what if we could connect farmers directly with
+                        consumers, eliminating middlemen and ensuring fair prices for everyone?</p>
+                    <p>We believe in building a sustainable food ecosystem where farmers get the recognition and payment
+                        they deserve, while customers enjoy the freshest produce at reasonable prices.</p>
+
+                    <div class="stats-row">
+                        <div class="stat-item">
+                            <span class="number">500+</span>
+                            <span class="label">Partner Farmers</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="number">10K+</span>
+                            <span class="label">Happy Customers</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="number">50+</span>
+                            <span class="label">Products</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-image">
+                    <img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600" alt="Farmer in field">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="values section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Our Values</h2>
+                <p>The principles that guide everything we do</p>
+            </div>
+
+            <div class="values-grid">
+                <div class="value-card glass-card">
+                    <span class="icon">🌱</span>
+                    <h3>Sustainability</h3>
+                    <p>Supporting eco-friendly farming practices for a greener tomorrow.</p>
+                </div>
+                <div class="value-card glass-card">
+                    <span class="icon">🤝</span>
+                    <h3>Fairness</h3>
+                    <p>Ensuring fair prices for farmers and affordable quality for consumers.</p>
+                </div>
+                <div class="value-card glass-card">
+                    <span class="icon">✨</span>
+                    <h3>Quality</h3>
+                    <p>Delivering only the freshest, highest-quality produce.</p>
+                </div>
+                <div class="value-card glass-card">
+                    <span class="icon">💚</span>
+                    <h3>Community</h3>
+                    <p>Building connections between farmers and families.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Meet Our Team</h2>
+                <p>The passionate people behind Digital Farmer</p>
+            </div>
+
+            <div class="team-grid">
+                @for (member of team; track member.name) {
+                <div class="team-card">
+                    <div class="avatar">{{ member.avatar }}</div>
+                    <h3>{{ member.name }}</h3>
+                    <p>{{ member.role }}</p>
+                </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact section">
+        <div class="container">
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h2>Get In Touch</h2>
+                    <p>Have questions or feedback? We'd love to hear from you.</p>
+
+                    <div class="contact-details">
+                        <div class="detail">
+                            <span class="icon">📍</span>
+                            <div>
+                                <strong>Address</strong>
+                                <p>Lahore, Pakistan</p>
+                            </div>
+                        </div>
+                        <div class="detail">
+                            <span class="icon">📞</span>
+                            <div>
+                                <strong>Phone</strong>
+                                <p>+92 300 1234567</p>
+                            </div>
+                        </div>
+                        <div class="detail">
+                            <span class="icon">✉️</span>
+                            <div>
+                                <strong>Email</strong>
+                                <p>info&#64;digitalfarmer.pk</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-form glass-card">
+                    @if (submitted) {
+                    <div class="success-message">
+                        <span>✅</span>
+                        <h3>Message Sent!</h3>
+                        <p>We'll get back to you soon.</p>
+                    </div>
+                    } @else {
+                    <form (ngSubmit)="onSubmit()">
+                        <div class="form-group">
+                            <label class="form-label">Your Name</label>
+                            <input type="text" class="form-input" [(ngModel)]="contactForm.name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-input" [(ngModel)]="contactForm.email" name="email"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Message</label>
+                            <textarea class="form-input" rows="4" [(ngModel)]="contactForm.message" name="message"
+                                required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+</section>

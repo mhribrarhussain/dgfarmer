@@ -1,0 +1,74 @@
+<section class="products-page">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>Fresh Products</h1>
+            <p>Explore our wide range of farm-fresh products</p>
+        </div>
+
+        <!-- Filters Bar -->
+        <div class="filters-bar glass-card">
+            <div class="search-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.3-4.3"></path>
+                </svg>
+                <input type="text" placeholder="Search products or farmers..." [(ngModel)]="searchQuery"
+                    (input)="onSearch()" class="search-input">
+            </div>
+
+            <div class="filter-controls">
+                <div class="sort-dropdown">
+                    <label>Sort by:</label>
+                    <select [(ngModel)]="sortBy" (change)="onSortChange()">
+                        <option value="name">Name</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="rating">Rating</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="products-layout">
+            <!-- Sidebar Categories -->
+            <aside class="categories-sidebar">
+                <h3>Categories</h3>
+                <ul class="category-list">
+                    @for (category of categories; track category) {
+                    <li>
+                        <button class="category-btn" [class.active]="selectedCategory === category"
+                            (click)="onCategoryChange(category)">
+                            <span class="icon">{{ getCategoryIcon(category) }}</span>
+                            <span class="name">{{ category | titlecase }}</span>
+                        </button>
+                    </li>
+                    }
+                </ul>
+            </aside>
+
+            <!-- Products Grid -->
+            <div class="products-main">
+                <div class="results-info">
+                    <span>Showing {{ filteredProducts.length }} products</span>
+                </div>
+
+                @if (filteredProducts.length > 0) {
+                <div class="product-grid">
+                    @for (product of filteredProducts; track product.id) {
+                    <app-product-card [product]="product"></app-product-card>
+                    }
+                </div>
+                } @else {
+                <div class="no-results">
+                    <span class="icon">🔍</span>
+                    <h3>No products found</h3>
+                    <p>Try adjusting your search or filter criteria</p>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>

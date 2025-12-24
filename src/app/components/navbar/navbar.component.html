@@ -1,0 +1,47 @@
+<nav class="navbar">
+    <div class="container navbar-content">
+        <a routerLink="/" class="logo">
+            <span class="logo-icon">🌾</span>
+            <span class="logo-text">Digital<span class="highlight">Farmer</span></span>
+        </a>
+
+        <button class="menu-toggle" (click)="toggleMenu()">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+
+        <ul class="nav-links" [class.active]="isMenuOpen">
+            <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
+            <li><a routerLink="/products" routerLinkActive="active">Products</a></li>
+            <li><a routerLink="/about" routerLinkActive="active">About</a></li>
+
+            @if (authService.isFarmer()) {
+            <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
+            }
+        </ul>
+
+        <div class="nav-actions">
+            <a routerLink="/cart" class="cart-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+                @if (cartService.getItemCount() > 0) {
+                <span class="cart-count">{{ cartService.getItemCount() }}</span>
+                }
+            </a>
+
+            @if (authService.isAuthenticated()) {
+            <div class="user-menu">
+                <span class="user-name">{{ authService.getCurrentUser()?.name }}</span>
+                <button class="btn btn-ghost" (click)="logout()">Logout</button>
+            </div>
+            } @else {
+            <a routerLink="/login" class="btn btn-primary">Login</a>
+            }
+        </div>
+    </div>
+</nav>

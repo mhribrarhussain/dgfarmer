@@ -1,0 +1,128 @@
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="container hero-content">
+        <div class="hero-text">
+            <span class="hero-badge">🌾 Farm Fresh</span>
+            <h1>Fresh From <span class="highlight">Farm</span> To Your <span class="highlight">Table</span></h1>
+            <p>Connect directly with local farmers. Get the freshest produce at fair prices while supporting sustainable
+                agriculture.</p>
+            <div class="hero-actions">
+                <a routerLink="/products" class="btn btn-primary">Shop Now</a>
+                <a routerLink="/about" class="btn btn-secondary">Learn More</a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number">500+</span>
+                    <span class="stat-label">Farmers</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">10K+</span>
+                    <span class="stat-label">Happy Customers</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">50+</span>
+                    <span class="stat-label">Products</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="floating-card card-1">
+                <span>🍅</span>
+                <div>
+                    <strong>Fresh Tomatoes</strong>
+                    <small>Rs. 120/kg</small>
+                </div>
+            </div>
+            <div class="floating-card card-2">
+                <span>🥛</span>
+                <div>
+                    <strong>Pure Milk</strong>
+                    <small>Rs. 180/liter</small>
+                </div>
+            </div>
+            <img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600"
+                alt="Fresh vegetables from farm" class="main-image">
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Why Choose Digital Farmer?</h2>
+            <p>We're revolutionizing how you buy fresh produce</p>
+        </div>
+
+        <div class="features-grid">
+            @for (feature of features; track feature.title) {
+            <div class="feature-card glass-card">
+                <span class="feature-icon">{{ feature.icon }}</span>
+                <h3>{{ feature.title }}</h3>
+                <p>{{ feature.description }}</p>
+            </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products Section -->
+<section class="featured-products section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-title" style="text-align: left; margin-bottom: 0;">
+                <h2>Featured Products</h2>
+                <p>Handpicked fresh produce from our best farmers</p>
+            </div>
+            <a routerLink="/products" class="btn btn-secondary">View All</a>
+        </div>
+
+        <div class="product-grid">
+            @for (product of featuredProducts; track product.id) {
+            <app-product-card [product]="product"></app-product-card>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials section">
+    <div class="container">
+        <div class="section-title">
+            <h2>What Our Customers Say</h2>
+            <p>Join thousands of satisfied customers</p>
+        </div>
+
+        <div class="testimonials-grid">
+            @for (testimonial of testimonials; track testimonial.name) {
+            <div class="testimonial-card glass-card">
+                <div class="testimonial-content">
+                    <p>"{{ testimonial.text }}"</p>
+                </div>
+                <div class="testimonial-author">
+                    <span class="avatar">{{ testimonial.avatar }}</span>
+                    <div>
+                        <strong>{{ testimonial.name }}</strong>
+                        <small>{{ testimonial.role }}</small>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta section">
+    <div class="container">
+        <div class="cta-content glass-card">
+            <div class="cta-text">
+                <h2>Become a Farmer Partner</h2>
+                <p>Join our network of farmers and sell your produce directly to customers. Fair prices, no middlemen.
+                </p>
+            </div>
+            <a routerLink="/register" class="btn btn-accent">Register as Farmer</a>
+        </div>
+    </div>
+</section>
