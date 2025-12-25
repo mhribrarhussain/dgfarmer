@@ -138,9 +138,52 @@
     }
 }
 
+.mobile-only {
+    display: none;
+}
+
+.mobile-cart-link,
+.login-link,
+.logout-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .cart-badge {
+        background: var(--primary-500);
+        color: white;
+        border-radius: 50%;
+        min-width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0 4px;
+    }
+}
+
+.logout-link {
+    cursor: pointer;
+}
+
 @media (max-width: 768px) {
     .menu-toggle {
         display: flex;
+    }
+
+    .desktop-only {
+        display: none !important;
+    }
+
+    .mobile-only {
+        display: block;
+
+        a {
+            font-weight: 600;
+            color: var(--primary-600);
+        }
     }
 
     .nav-links {

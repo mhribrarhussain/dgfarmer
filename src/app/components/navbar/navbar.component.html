@@ -22,9 +22,31 @@
             @if (authService.isAuthenticated() && !authService.isFarmer()) {
             <li><a routerLink="/my-orders" routerLinkActive="active">My Orders</a></li>
             }
+
+            <!-- Mobile-only auth actions -->
+            <li class="mobile-only">
+                @if (!authService.isFarmer()) {
+                <a routerLink="/cart" class="mobile-cart-link">
+                    🛒 Cart
+                    @if (cartService.getItemCount() > 0) {
+                    <span class="cart-badge">{{ cartService.getItemCount() }}</span>
+                    }
+                </a>
+                }
+            </li>
+
+            @if (authService.isAuthenticated()) {
+            <li class="mobile-only">
+                <a (click)="logout()" class="logout-link">Logout ({{ authService.getCurrentUser()?.name }})</a>
+            </li>
+            } @else {
+            <li class="mobile-only">
+                <a routerLink="/login" class="login-link">Login</a>
+            </li>
+            }
         </ul>
 
-        <div class="nav-actions">
+        <div class="nav-actions desktop-only">
             @if (!authService.isFarmer()) {
             <a routerLink="/cart" class="cart-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
