@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://dgfarmer-api.onrender.com/api'
+    apiUrl: 'http://localhost:5038/api'
 };
