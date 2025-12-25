@@ -18,6 +18,6 @@ export interface Order {
 export interface CreateOrderDto {
     items: { productId: number; quantity: number }[];
     shippingAddress: string;
-    phone: string;
+    phone?: string;
     note?: string;
 }

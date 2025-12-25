@@ -28,6 +28,12 @@ export class CartComponent {
     checkoutError = '';
 
     constructor() {
+        // Redirect farmers to dashboard - they cannot use cart
+        if (this.authService.isFarmer()) {
+            this.router.navigate(['/dashboard']);
+            return;
+        }
+
         const user = this.authService.getCurrentUser();
         if (user) {
             this.shippingAddress = user.address || '';
@@ -69,8 +75,14 @@ export class CartComponent {
             return;
         }
 
-        if (!this.shippingAddress || !this.phone) {
-            this.checkoutError = 'Please provide shipping address and phone number.';
+        // Check if user is a farmer - farmers cannot place orders
+        if (this.authService.isFarmer()) {
+            this.checkoutError = 'Farmers cannot place orders. Please use a buyer account to purchase products.';
+            return;
+        }
+
+        if (!this.shippingAddress) {
+            this.checkoutError = 'Please provide your delivery address.';
             return;
         }
 
@@ -82,13 +94,11 @@ export class CartComponent {
                 productId: item.product.id,
                 quantity: item.quantity
             })),
-            shippingAddress: this.shippingAddress,
-            phone: this.phone,
-            note: this.note
+            shippingAddress: this.shippingAddress
         };
 
         this.orderService.placeOrder(orderDto).subscribe({
-            next: (order) => {
+            next: (orders) => {
                 this.cartService.clearCart();
                 this.router.navigate(['/my-orders']);
             },

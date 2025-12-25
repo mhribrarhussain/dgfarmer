@@ -32,7 +32,7 @@ export class LoginComponent {
                 if (user?.role === 'farmer') {
                     this.router.navigate(['/dashboard']);
                 } else {
-                    this.router.navigate(['/']);
+                    this.router.navigate(['/my-orders']);
                 }
             } else {
                 this.error = result.error || 'Invalid email or password. Please register first if you don\'t have an account.';

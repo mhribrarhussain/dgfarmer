@@ -4,11 +4,8 @@
         <div class="dashboard-header">
             <div class="welcome">
                 <h1>Hello, {{ user?.name }}! 👋</h1>
-                <p>Welcome back to your Digital Farmer account.</p>
+                <p>Track your orders and message farmers here.</p>
             </div>
-            <button class="btn btn-primary" (click)="logout()">
-                Logout
-            </button>
         </div>
 
         <!-- Orders Section -->
@@ -34,9 +31,24 @@
                             <span class="order-id">Order #{{ order.id }}</span>
                             <span class="order-date">{{ order.createdAt | date:'mediumDate' }}</span>
                         </div>
-                        <span class="status-badge" [class]="getStatusClass(order.status)">
-                            {{ order.status | titlecase }}
-                        </span>
+                        <div class="order-actions">
+                            <span class="status-badge" [class]="getStatusClass(order.status)">
+                                @if (order.status === 'accepted') {
+                                ✅ Accepted
+                                } @else if (order.status === 'rejected') {
+                                ❌ Rejected
+                                } @else if (order.status === 'cancelled') {
+                                🚫 Cancelled
+                                } @else {
+                                ⏳ Pending
+                                }
+                            </span>
+                            @if (order.status === 'pending') {
+                            <button class="cancel-btn" (click)="cancelOrder(order.id)" title="Cancel Order">
+                                Cancel
+                            </button>
+                            }
+                        </div>
                     </div>
 
                     <div class="order-items">
@@ -54,12 +66,38 @@
                             <span>Total:</span>
                             <strong>Rs. {{ order.total }}</strong>
                         </div>
-                        @if (order.customerNote) {
-                        <div class="order-note">
-                            <small>Note: {{ order.customerNote }}</small>
+                        <button class="message-toggle-btn" (click)="toggleMessages(order.id)">
+                            💬 {{ expandedOrderId === order.id ? 'Hide Messages' : 'Message Farmer' }}
+                        </button>
+                    </div>
+
+                    @if (expandedOrderId === order.id) {
+                    <div class="messages-section">
+                        @if (loadingMessages[order.id]) {
+                        <p class="loading-messages">Loading messages...</p>
+                        } @else {
+                        <div class="messages-list">
+                            @if (!messages[order.id] || messages[order.id].length === 0) {
+                            <p class="no-messages">No messages yet. Start a conversation!</p>
+                            }
+                            @for (msg of messages[order.id]; track msg.id) {
+                            <div class="message" [class.my-message]="msg.senderRole === 'buyer'">
+                                <div class="message-header">
+                                    <span class="sender">{{ msg.senderName }}</span>
+                                    <span class="time">{{ msg.createdAt | date:'short' }}</span>
+                                </div>
+                                <p class="message-content">{{ msg.content }}</p>
+                            </div>
+                            }
+                        </div>
+                        <div class="message-input">
+                            <input type="text" [(ngModel)]="newMessage[order.id]" placeholder="Type a message..."
+                                (keyup.enter)="sendMessage(order.id)">
+                            <button class="send-btn" (click)="sendMessage(order.id)">Send</button>
                         </div>
                         }
                     </div>
+                    }
                 </div>
                 }
             </div>

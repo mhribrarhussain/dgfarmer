@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
@@ -14,6 +14,7 @@ import { AuthService } from '../../services/auth.service';
 export class NavbarComponent {
     cartService = inject(CartService);
     authService = inject(AuthService);
+    private router = inject(Router);
 
     isMenuOpen = false;
 
@@ -23,5 +24,6 @@ export class NavbarComponent {
 
     logout() {
         this.authService.logout();
+        this.router.navigate(['/']);
     }
 }

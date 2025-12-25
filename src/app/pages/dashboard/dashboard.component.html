@@ -45,9 +45,9 @@
                         <tr>
                             <th>Order ID</th>
                             <th>Customer Items</th>
-                            <th>Total (My Items)</th>
-                            <th>Note</th>
+                            <th>Total</th>
                             <th>Status</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -61,18 +61,60 @@
                                     }
                                 </ul>
                             </td>
-                            <td>Rs. {{ order.total }}</td> <!-- This is total of filtered items now -->
+                            <td>Rs. {{ order.total }}</td>
                             <td>
-                                @if(order.customerNote) {
-                                <span class="note-tooltip" [title]="order.customerNote">📝 Note</span>
-                                } @else {
-                                <span class="text-muted">-</span>
-                                }
+                                <span class="status-badge" [class]="getStatusClass(order.status)">
+                                    {{ order.status | titlecase }}
+                                </span>
                             </td>
-                            <td><span class="status-badge" [class]="getStatusClass(order.status)">{{ order.status |
-                                    titlecase
-                                    }}</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    @if (order.status === 'pending') {
+                                    <button class="accept-btn" (click)="acceptOrder(order.id)" title="Accept Order">
+                                        ✅ Accept
+                                    </button>
+                                    <button class="reject-btn" (click)="rejectOrder(order.id)" title="Reject Order">
+                                        ❌ Reject
+                                    </button>
+                                    }
+                                    <button class="message-btn" (click)="toggleMessages(order.id)">
+                                        💬 {{ expandedOrderId === order.id ? 'Hide' : 'Messages' }}
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
+                        <!-- Messages Section (expandable) -->
+                        @if (expandedOrderId === order.id) {
+                        <tr class="messages-row">
+                            <td colspan="5">
+                                <div class="messages-section">
+                                    @if (loadingMessages[order.id]) {
+                                    <p class="loading-messages">Loading messages...</p>
+                                    } @else {
+                                    <div class="messages-list">
+                                        @if (!messages[order.id] || messages[order.id].length === 0) {
+                                        <p class="no-messages">No messages from customer yet.</p>
+                                        }
+                                        @for (msg of messages[order.id]; track msg.id) {
+                                        <div class="message" [class.my-message]="msg.senderRole === 'farmer'">
+                                            <div class="message-header">
+                                                <span class="sender">{{ msg.senderName }}</span>
+                                                <span class="time">{{ msg.createdAt | date:'short' }}</span>
+                                            </div>
+                                            <p class="message-content">{{ msg.content }}</p>
+                                        </div>
+                                        }
+                                    </div>
+                                    <div class="message-input">
+                                        <input type="text" [(ngModel)]="newMessage[order.id]"
+                                            placeholder="Reply to customer..." (keyup.enter)="sendMessage(order.id)">
+                                        <button class="send-btn" (click)="sendMessage(order.id)">Send</button>
+                                    </div>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                        }
                         }
                     </tbody>
                 </table>
@@ -94,6 +136,14 @@
                             <p>Rs. {{ product.price }} / {{ product.unit }}</p>
                         </div>
                         <span class="stock-badge">{{ product.stock }} in stock</span>
+                        <div class="product-actions">
+                            <button class="action-btn edit-btn" (click)="openEditModal(product)" title="Edit">
+                                ✏️
+                            </button>
+                            <button class="action-btn delete-btn" (click)="deleteProduct(product)" title="Delete">
+                                🗑️
+                            </button>
+                        </div>
                     </div>
                     }
                 </div>
@@ -148,37 +198,110 @@
                         <label class="form-label">Stock Quantity</label>
                         <input type="number" class="form-input" [(ngModel)]="newProduct.stock" name="stock" min="0">
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Image</label>
-                        <div class="image-upload-wrapper">
-                            <input type="file" id="productImage" accept="image/*" (change)="onImageSelected($event)"
-                                class="file-input">
-                            <label for="productImage" class="file-label">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                    <polyline points="21 15 16 10 5 21"></polyline>
-                                </svg>
-                                Choose Image
-                            </label>
+                </div>
+
+                <!-- Enhanced Image Upload Section -->
+                <div class="form-group image-upload-section">
+                    <label class="form-label">Product Image</label>
+                    <div class="upload-zone" [class.has-preview]="imagePreview" [class.uploading]="isUploading"
+                        (dragover)="$event.preventDefault()" (drop)="onFileDrop($event)">
+
+                        @if (isUploading) {
+                        <div class="upload-progress">
+                            <div class="spinner"></div>
+                            <p>Processing image...</p>
                         </div>
+                        } @else if (imagePreview) {
+                        <div class="preview-container">
+                            <img [src]="imagePreview" alt="Preview">
+                            <div class="preview-overlay">
+                                <button type="button" class="change-btn" (click)="triggerFileInput()">
+                                    📷 Change
+                                </button>
+                                <button type="button" class="remove-btn" (click)="removeImage()">
+                                    🗑️ Remove
+                                </button>
+                            </div>
+                        </div>
+                        } @else {
+                        <div class="upload-placeholder" (click)="triggerFileInput()">
+                            <div class="upload-icon">📸</div>
+                            <p class="upload-text">Drag & drop image here</p>
+                            <p class="upload-hint">or click to browse</p>
+                            <span class="file-types">JPG, PNG, GIF up to 5MB</span>
+                        </div>
+                        }
+
+                        <input type="file" id="productImage" #fileInput accept="image/*"
+                            (change)="onImageSelected($event)" class="file-input-hidden">
                     </div>
-                </div>
-                @if (imagePreview) {
-                <div class="image-preview">
-                    <img [src]="imagePreview" alt="Preview">
-                    <button type="button" class="remove-image" (click)="removeImage()">×</button>
-                </div>
-                }
-                <div class="form-group">
-                    <label class="form-label">Or paste Image URL</label>
-                    <input type="url" class="form-input" [(ngModel)]="newProduct.image" name="image"
-                        placeholder="https://example.com/image.jpg">
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-ghost" (click)="closeAddModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Add Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    }
+    <!-- Edit Product Modal -->
+    @if (showEditModal) {
+    <div class="modal-overlay" (click)="closeEditModal()">
+        <div class="modal glass-card" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Edit Product</h2>
+                <button class="close-btn" (click)="closeEditModal()">×</button>
+            </div>
+            <form (ngSubmit)="updateProduct()">
+                <div class="form-group">
+                    <label class="form-label">Product Name</label>
+                    <input type="text" class="form-input" [(ngModel)]="editProduct.name" name="editName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-input" rows="3" [(ngModel)]="editProduct.description"
+                        name="editDescription"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Price (Rs.)</label>
+                        <input type="number" class="form-input" [(ngModel)]="editProduct.price" name="editPrice"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Unit</label>
+                        <select class="form-input" [(ngModel)]="editProduct.unit" name="editUnit">
+                            <option value="kg">Kilogram</option>
+                            <option value="dozen">Dozen</option>
+                            <option value="liter">Liter</option>
+                            <option value="bundle">Bundle</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select class="form-input" [(ngModel)]="editProduct.category" name="editCategory">
+                            <option value="vegetables">Vegetables</option>
+                            <option value="fruits">Fruits</option>
+                            <option value="grains">Grains</option>
+                            <option value="dairy">Dairy</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Stock</label>
+                        <input type="number" class="form-input" [(ngModel)]="editProduct.stock" name="editStock"
+                            min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Image URL</label>
+                    <input type="url" class="form-input" [(ngModel)]="editProduct.image" name="editImage"
+                        placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-ghost" (click)="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
         </div>

@@ -1,5 +1,5 @@
 .dashboard-page {
-    padding: 2rem 0;
+    padding: 6rem 0 2rem;
     min-height: 80vh;
 }
 
@@ -12,13 +12,12 @@
     h1 {
         margin: 0;
         font-size: 2rem;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: var(--text-dark);
+        font-weight: 700;
     }
 
     p {
-        color: var(--text-light);
+        color: #666;
         margin: 0.5rem 0 0;
     }
 }
@@ -170,4 +169,132 @@
     text-align: center;
     padding: 2rem;
     color: var(--text-light);
+}
+
+/* Messaging Styles */
+.order-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cancel-btn {
+    padding: 0.4rem 0.8rem;
+    background: #fee2e2;
+    color: #991b1b;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: #ef4444;
+        color: white;
+    }
+}
+
+.message-toggle-btn {
+    background: #f0f9ff;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: #0ea5e9;
+        color: white;
+        border-color: #0ea5e9;
+    }
+}
+
+.messages-section {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #e5e7eb;
+}
+
+.messages-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+
+.no-messages,
+.loading-messages {
+    text-align: center;
+    color: #999;
+    padding: 1rem;
+    font-style: italic;
+}
+
+.message {
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    background: #f3f4f6;
+    border-radius: 12px;
+    max-width: 80%;
+
+    &.my-message {
+        background: #dcfce7;
+        margin-left: auto;
+    }
+
+    .message-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.25rem;
+        font-size: 0.75rem;
+
+        .sender {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .time {
+            color: #9ca3af;
+        }
+    }
+
+    .message-content {
+        margin: 0;
+        color: #1f2937;
+        font-size: 0.9rem;
+    }
+}
+
+.message-input {
+    display: flex;
+    gap: 0.5rem;
+
+    input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        font-size: 0.9rem;
+
+        &:focus {
+            outline: none;
+            border-color: #22c55e;
+        }
+    }
+
+    .send-btn {
+        padding: 0.75rem 1.5rem;
+        background: #22c55e;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background 0.2s;
+
+        &:hover {
+            background: #16a34a;
+        }
+    }
 }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Product } from '../../models/product.model';
 import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-product-card',
@@ -15,6 +16,7 @@ export class ProductCardComponent {
     @Input() product!: Product;
 
     private cartService = inject(CartService);
+    authService = inject(AuthService);
 
     addToCart(event: Event) {
         event.preventDefault();

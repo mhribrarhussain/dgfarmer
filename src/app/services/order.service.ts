@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { CreateOrderDto, Order } from '../models/order.model';
+import { Message, SendMessage } from '../models/message.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -11,8 +12,8 @@ export class OrderService {
     private http = inject(HttpClient);
     private apiUrl = `${environment.apiUrl}/orders`;
 
-    placeOrder(order: CreateOrderDto): Observable<Order> {
-        return this.http.post<Order>(this.apiUrl, order);
+    placeOrder(order: CreateOrderDto): Observable<Order[]> {
+        return this.http.post<Order[]>(this.apiUrl, order);
     }
 
     getMyOrders(): Observable<Order[]> {
@@ -23,9 +24,24 @@ export class OrderService {
         return this.http.get<Order[]>(`${this.apiUrl}/received`);
     }
 
-    updateStatus(orderId: number, status: string): Observable<void> {
-        return this.http.put<void>(`${this.apiUrl}/${orderId}/status`, JSON.stringify(status), {
-            headers: { 'Content-Type': 'application/json' }
-        });
+    acceptOrder(orderId: number): Observable<any> {
+        return this.http.post(`${this.apiUrl}/${orderId}/accept`, {});
+    }
+
+    rejectOrder(orderId: number): Observable<any> {
+        return this.http.post(`${this.apiUrl}/${orderId}/reject`, {});
+    }
+
+    cancelOrder(orderId: number): Observable<any> {
+        return this.http.post(`${this.apiUrl}/${orderId}/cancel`, {});
+    }
+
+    // Messaging
+    getMessages(orderId: number): Observable<Message[]> {
+        return this.http.get<Message[]>(`${this.apiUrl}/${orderId}/messages`);
+    }
+
+    sendMessage(orderId: number, content: string): Observable<Message> {
+        return this.http.post<Message>(`${this.apiUrl}/${orderId}/messages`, { content });
     }
 }

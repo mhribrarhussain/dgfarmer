@@ -19,9 +19,13 @@
             @if (authService.isFarmer()) {
             <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
             }
+            @if (authService.isAuthenticated() && !authService.isFarmer()) {
+            <li><a routerLink="/my-orders" routerLinkActive="active">My Orders</a></li>
+            }
         </ul>
 
         <div class="nav-actions">
+            @if (!authService.isFarmer()) {
             <a routerLink="/cart" class="cart-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -33,6 +37,7 @@
                 <span class="cart-count">{{ cartService.getItemCount() }}</span>
                 }
             </a>
+            }
 
             @if (authService.isAuthenticated()) {
             <div class="user-menu">
